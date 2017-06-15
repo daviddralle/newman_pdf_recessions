@@ -20,8 +20,8 @@ import a_b_functions
 import warnings
 warnings.filterwarnings("ignore")
 site_data = gp.read_file('./USGS_Streamgages-NHD_Locations.shp')
-# seasons = ['spring', 'summer', 'fall', 'winter', 'wet']
-seasons = ['spring', 'fall']
+seasons = ['spring', 'summer', 'fall', 'winter', 'wet', 'annual']
+# seasons = ['spring', 'fall']
 
 
 def run_newman(fh):
@@ -73,6 +73,9 @@ def run_newman(fh):
         elif seasons[ind]=='wet':
             tw = len(pd.date_range('11-2016', '4-2017'))
             d = df.q.loc[(df.index.month>=11)|(df.index.month<=4)]
+        elif seasons[ind]=='annual':
+            tw = 365
+            d = df.q.loc[(df.index.month>=1)|(df.index.month<=12)]
 
         
         fig, axes = plt.subplots(3,2, figsize=(10,12))
