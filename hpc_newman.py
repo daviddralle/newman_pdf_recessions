@@ -44,7 +44,7 @@ def run_newman(fh):
     R2B_K = {}
 
     site = fh.split('/')[-1][:8]
-    weather = pickle.load( open('./daymet_newman/'+site+'_daymet.p', 'rb') )
+    # weather = pickle.load( open('./daymet_newman/'+site+'_daymet.p', 'rb') )
     df = pd.read_csv(fh, delim_whitespace=True, header=-1)
     df.columns = ['gagenum', 'Year', 'Month', 'Day', 'q', 'e']
     df['date'] = df[['Year', 'Month', 'Day']].apply(lambda s : datetime.datetime(*s),axis = 1)
