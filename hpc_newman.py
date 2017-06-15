@@ -20,8 +20,8 @@ import a_b_functions
 import warnings
 warnings.filterwarnings("ignore")
 site_data = gp.read_file('./USGS_Streamgages-NHD_Locations.shp')
-seasons = ['spring', 'summer', 'fall', 'winter', 'wet', 'annual']
-# seasons = ['spring', 'fall']
+# seasons = ['spring', 'summer', 'fall', 'winter', 'wet', 'annual']
+seasons = ['fall']
 
 
 def run_newman(fh):
@@ -79,7 +79,6 @@ def run_newman(fh):
 
         
         fig, axes = plt.subplots(3,2, figsize=(10,12))
-        print('made it past plots')
         A_hat, B_hat, P_hat, dateList = kirchner_fitter(d, ax=axes[0,0])
         A[(site, seasons[ind])] = A_hat
         B[(site, seasons[ind])] = B_hat
@@ -111,9 +110,10 @@ def run_newman(fh):
 
 
 def main():
-	flow_files = a_b_functions.getFlowFileList()
-	res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
-	pickle.dump(res, open('./results.p', 'wb'))
+    flow_files = a_b_functions.getFlowFileList()
+    # res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+    res = Parallel(n_jobs=1)(delayed(run_newman) (flow_files[i]) for i in [0])
+    pickle.dump(res, open('./results.p', 'wb'))
 
 if __name__ == '__main__':
 	main()
