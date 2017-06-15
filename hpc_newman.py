@@ -109,7 +109,7 @@ def run_newman(fh):
 
 def main():
 	flow_files = a_b_functions.getFlowFileList()
-	res = Parallel(n_jobs=2)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+	res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
 	pickle.dump(res, open('./results.p', 'wb'))
 
 if __name__ == '__main__':
