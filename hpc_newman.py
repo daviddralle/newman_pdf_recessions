@@ -1,4 +1,6 @@
 from math import sqrt
+import matplotlib
+matplotlib.use('Agg')
 from joblib import Parallel, delayed
 import numpy as np, matplotlib.pylab as plt, seaborn as sns, mpmath as mp, scipy.special as ss, sys
 sys.path.append('os.getcwd()')
@@ -17,14 +19,15 @@ from a_b_functions import getFlow as getFlow
 import a_b_functions
 import warnings
 warnings.filterwarnings("ignore")
+site_data = gp.read_file('./USGS_Streamgages-NHD_Locations.shp')
+# seasons = ['spring', 'summer', 'fall', 'winter', 'wet']
+seasons = ['spring', 'fall']
 
 
 def run_newman(fh):
     A = {}
     B = {}
     P = {}
-    R2_arr = {}
-    R2_storage = {}
     B_pdf = {}
     nu_pdf = {}
     datedict = {}
@@ -37,6 +40,8 @@ def run_newman(fh):
     NU_K_BSE = {}
     R2_ARR = {}
     R2_STORAGE = {}
+    R2B = {}
+    R2B_K = {}
 
     site = fh.split('/')[-1][:8]
     weather = pickle.load( open('./daymet_newman/'+site+'_daymet.p', 'rb') )
@@ -71,7 +76,7 @@ def run_newman(fh):
 
         
         fig, axes = plt.subplots(3,2, figsize=(10,12))
-        
+        print('made it past plots')
         A_hat, B_hat, P_hat, dateList = kirchner_fitter(d, ax=axes[0,0])
         A[(site, seasons[ind])] = A_hat
         B[(site, seasons[ind])] = B_hat
@@ -83,7 +88,7 @@ def run_newman(fh):
         sample = pd.DataFrame({'q':d.tolist()}).q
         MU_E[(site, seasons[ind])] = sample.mean()
         B_pdf_hat, nu_hat, B_pdf_bse, nu_bse, mu_t, r2b = pdf_fitter(sample, ax=axes[0,1])
-        B_whatever, nu_k, B_junk, nu_k_bse, mu_kt, r2b = pdf_fitter(sample, ax=axes[0,1], b=B_hat)
+        B_whatever, nu_k, B_junk, nu_k_bse, mu_kt, r2b_k = pdf_fitter(sample, ax=axes[0,1], b=B_hat)
         
         MU_KT[(site, seasons[ind])] = mu_kt
         MU_T[(site, seasons[ind])] = mu_t
@@ -95,18 +100,15 @@ def run_newman(fh):
         LAM_H[(site, seasons[ind])] = np.mean(arrivals)
         ALPHA_H[(site, seasons[ind])] = np.mean(storage_mags)
         NU_K[(site, seasons[ind])] = nu_k
-        NU_K_BSE[(site, seasons[ind])] = nu_k_se
+        NU_K_BSE[(site, seasons[ind])] = nu_k_bse
         
         savestr = site + '_' + seasons[ind] + '.png'
         fig.savefig('./plots/'+savestr)
-    return (A, B, datedict, B_pdf, nu_pdf, r2_arr, r2_storage, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T)
+    return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K)
 
 
 def main():
 	flow_files = a_b_functions.getFlowFileList()
-	site_data = gp.read_file('./USGS_Streamgages-NHD_Locations.shp')
-	# seasons = ['spring', 'summer', 'fall', 'winter', 'wet']
-	seasons = ['spring', 'fall']
 	res = Parallel(n_jobs=2)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
 	pickle.dump(res, open('./results.p', 'wb'))
 
