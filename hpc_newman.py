@@ -1,13 +1,13 @@
 from math import sqrt
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 from joblib import Parallel, delayed
 import numpy as np, matplotlib.pylab as plt, seaborn as sns, mpmath as mp, scipy.special as ss, sys
 sys.path.append('os.getcwd()')
 import geopandas as gp, pandas as pd, urllib2
 from matplotlib import rc
-rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-rc('text', usetex=True)
+# rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
+# rc('text', usetex=True)
 import os
 import datetime
 import pickle
@@ -111,7 +111,7 @@ def run_newman(fh):
         ALPHA_H[(site, seasons[ind])] = np.mean(storage_mags)
         NU_K[(site, seasons[ind])] = nu_k
         NU_K_BSE[(site, seasons[ind])] = nu_k_bse
-        savestr = site + '_' + seasons[ind] + '.pdf'
+        savestr = site + '_' + seasons[ind] + '.png'
         fig.savefig('./plots/'+savestr)
 
     return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
