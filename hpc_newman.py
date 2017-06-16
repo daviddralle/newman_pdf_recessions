@@ -81,9 +81,7 @@ def run_newman(fh):
 
         
         fig, axes = plt.subplots(3,2, figsize=(10,12))
-        print('made it past plotting')
         A_hat, B_hat, P_hat, dateList, alist, blist = kirchner_fitter(d, ax=axes[0,0])
-        print('finished ab fits')
         A[(site, seasons[ind])] = A_hat
         A_EVENT[(site, seasons[ind])] = alist
         B_EVENT[(site, seasons[ind])] = blist
