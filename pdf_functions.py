@@ -53,7 +53,7 @@ def Cn_calc(b, nu, mu=1, Qm8=-1):
         Cn = 1.
 
     else:
-        with mp.workdps(20):
+        with mp.workdps(50):
             b = mp.mpf(b)
             mu = mp.mpf(mu)
             k = mp.mpf(1. / nu)
@@ -139,7 +139,7 @@ def bot_pdf(x, b=b, nu=nu, mu=mu):
 
     else:
         ### Slow Accurate Method ###
-        with mp.workdps(20):
+        with mp.workdps(35):
             b = mp.mpf(b)
             mu = mp.mpf(1)
             k = mp.mpf(k)
@@ -202,7 +202,7 @@ def make_fixed_b_likelihood(b_in):
 
         else:
             ### Slow Accurate Method ###
-            with mp.workdps(20):
+            with mp.workdps(35):
                 b = mp.mpf(b)
                 mu = mp.mpf(1)
                 k = mp.mpf(k)

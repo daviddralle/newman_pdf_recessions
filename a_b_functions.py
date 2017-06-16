@@ -92,6 +92,8 @@ def _finditem(obj, key):
 def kirchner_fitter(d, option=1, start=1, selectivity=200, window=3, minLen=5, ax=None):
 
     dateList = []
+    blist = []
+    alist = []
     dates = d.index
     d = pd.DataFrame({'q':d.tolist()})
     selector = (d.q.max()-d.q.min())/selectivity
@@ -111,14 +113,23 @@ def kirchner_fitter(d, option=1, start=1, selectivity=200, window=3, minLen=5, a
         d['choose']=(d['Dunsmooth']<0) & ((d['DDsmooth']>=0)|(d['DDunsmooth']>=0))
 
     datesMax = d.ix[d['peaks']>0].index
-
+    def func(t, q0, a, b):
+            return ((-1+b)*(q0**(1-b)/(b-1)+a*t))**(1/(1-b))
     for i in np.arange(len(datesMax)-1):
         recStart = datesMax[i]; peak1 = datesMax[i]+start; peak2 = datesMax[i+1]
         recEnd = d[peak1:peak2][d[peak1:peak2]['choose']==False].index[0]
         if (len(d[recStart:recEnd])<minLen) | (np.any(d.q[recStart:recEnd]<0)):
             continue
         t = np.arange(len(d.q[recStart:recEnd]))
-        q0 = d.q[recStart]
+        q0_data = d.q.loc[recStart]
+        try:
+            popt, cov = curve_fit(func,t,d.q[recStart:(recEnd)],[q0_data, .1, 1.5])
+            if (popt[2]>0)&(popt[2]<10):
+                alist.append(popt[1])
+                blist.append(popt[2])
+
+        except RuntimeError:
+            print('Error encountered in fitting')
 
         dateList.append(dates[i])
 
@@ -153,7 +164,7 @@ def kirchner_fitter(d, option=1, start=1, selectivity=200, window=3, minLen=5, a
     # else:
     #     p = np.polyfit(np.log(recessions.q),np.log(-recessions.dq/recessions.q),2)
 
-    return acurr, bcurr, p, dateList
+    return acurr, bcurr, p, dateList, alist, blist
 
 
 def getFlowFileList():

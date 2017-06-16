@@ -20,8 +20,8 @@ import a_b_functions
 import warnings
 warnings.filterwarnings("ignore")
 site_data = gp.read_file('./USGS_Streamgages-NHD_Locations.shp')
-# seasons = ['spring', 'summer', 'fall', 'winter', 'wet', 'annual']
-seasons = ['fall']
+seasons = ['spring', 'summer', 'fall', 'winter', 'wet', 'annual']
+# seasons = ['fall', 'wet']
 
 
 def run_newman(fh):
@@ -42,6 +42,8 @@ def run_newman(fh):
     R2_STORAGE = {}
     R2B = {}
     R2B_K = {}
+    A_EVENT = {}
+    B_EVENT = {}
 
     site = fh.split('/')[-1][:8]
     # weather = pickle.load( open('./daymet_newman/'+site+'_daymet.p', 'rb') )
@@ -79,8 +81,12 @@ def run_newman(fh):
 
         
         fig, axes = plt.subplots(3,2, figsize=(10,12))
-        A_hat, B_hat, P_hat, dateList = kirchner_fitter(d, ax=axes[0,0])
+        print('made it past plotting')
+        A_hat, B_hat, P_hat, dateList, alist, blist = kirchner_fitter(d, ax=axes[0,0])
+        print('finished ab fits')
         A[(site, seasons[ind])] = A_hat
+        A_EVENT[(site, seasons[ind])] = alist
+        B_EVENT[(site, seasons[ind])] = blist
         B[(site, seasons[ind])] = B_hat
         P[(site, seasons[ind])] = P_hat
         datedict[(site, seasons[ind])] = dateList
@@ -89,9 +95,13 @@ def run_newman(fh):
         # pdf_fitter needs a numnpy array of all daily discharge magnitudes in timeseries. If you pass it an axis, it will plot pdf of sample against best fit. 
         sample = pd.DataFrame({'q':d.tolist()}).q
         MU_E[(site, seasons[ind])] = sample.mean()
-        B_pdf_hat, nu_hat, B_pdf_bse, nu_bse, mu_t, r2b = pdf_fitter(sample, ax=axes[0,1])
-        B_whatever, nu_k, B_junk, nu_k_bse, mu_kt, r2b_k = pdf_fitter(sample, ax=axes[0,1], b=B_hat)
-        
+        try: 
+            B_pdf_hat, nu_hat, B_pdf_bse, nu_bse, mu_t, r2b = pdf_fitter(sample, ax=axes[0,1])
+            B_whatever, nu_k, B_junk, nu_k_bse, mu_kt, r2b_k = pdf_fitter(sample, ax=axes[0,1], b=B_hat)
+        except: 
+            B_pdf_hat, nu_hat, B_pdf_bse, nu_bse, mu_t, r2b = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+            B_whatever, nu_k, B_junk, nu_k_bse, mu_kt, r2b_k = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
+            
         MU_KT[(site, seasons[ind])] = mu_kt
         MU_T[(site, seasons[ind])] = mu_t
         B_pdf[(site, seasons[ind])] = B_pdf_hat
@@ -103,16 +113,16 @@ def run_newman(fh):
         ALPHA_H[(site, seasons[ind])] = np.mean(storage_mags)
         NU_K[(site, seasons[ind])] = nu_k
         NU_K_BSE[(site, seasons[ind])] = nu_k_bse
-        # test
         savestr = site + '_' + seasons[ind] + '.png'
         fig.savefig('./plots/'+savestr)
-    return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K)
+
+    return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
 
 
 def main():
     flow_files = a_b_functions.getFlowFileList()
-    # res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
-    res = Parallel(n_jobs=1)(delayed(run_newman) (flow_files[i]) for i in [0])
+    res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+    # res = Parallel(n_jobs=4)(delayed(run_newman) (flow_files[i]) for i in [1])
     pickle.dump(res, open('./results.p', 'wb'))
 
 if __name__ == '__main__':
