@@ -21,6 +21,7 @@ import warnings
 warnings.filterwarnings("ignore")
 site_data = gp.read_file('./USGS_Streamgages-NHD_Locations.shp')
 seasons = ['spring', 'summer', 'fall', 'winter', 'wet', 'annual']
+snowfrac = pickle.load( open('./snow_fraction.p','rb') )
 # seasons = ['fall', 'wet']
 
 
@@ -46,6 +47,9 @@ def run_newman(fh):
     B_EVENT = {}
 
     site = fh.split('/')[-1][:8]
+    if snowfrac.loc[site] > 0.01: 
+        return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
+
     # weather = pickle.load( open('./daymet_newman/'+site+'_daymet.p', 'rb') )
     df = pd.read_csv(fh, delim_whitespace=True, header=-1)
     df.columns = ['gagenum', 'Year', 'Month', 'Day', 'q', 'e']
@@ -119,8 +123,8 @@ def run_newman(fh):
 
 def main():
     flow_files = a_b_functions.getFlowFileList()
-    # res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
-    res = Parallel(n_jobs=4)(delayed(run_newman) (flow_files[i]) for i in [1, 2])
+    res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+    # res = Parallel(n_jobs=4)(delayed(run_newman) (flow_files[i]) for i in [1, 2])
     pickle.dump(res, open('./results.p', 'wb'))
 
 if __name__ == '__main__':

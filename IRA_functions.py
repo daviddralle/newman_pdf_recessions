@@ -94,7 +94,7 @@ def assess_IRA(d, A_hat, B_hat, tw=100, axs=None):
             storage_mags[ii] = C*((np.asarray(jump_df.Q2[ii]).astype(float)**(2.-B_hat)) - (np.asarray(jump_df.Q1[ii]).astype(float)**(2.-B_hat)))
 
     storage_mags = storage_mags[np.isfinite(storage_mags)]
-    arrivals = arrivals[arrivals<tw]
+    arrivals = arrivals[arrivals<=tw]
 
     estimate_arrivals = {'alpha': 1, 'beta': arrivals.mean()}
     estimate_storage_mags = {'alpha': 1, 'beta': storage_mags.mean()}
