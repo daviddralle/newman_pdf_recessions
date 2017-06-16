@@ -111,7 +111,7 @@ def run_newman(fh):
         ALPHA_H[(site, seasons[ind])] = np.mean(storage_mags)
         NU_K[(site, seasons[ind])] = nu_k
         NU_K_BSE[(site, seasons[ind])] = nu_k_bse
-        savestr = site + '_' + seasons[ind] + '.png'
+        savestr = site + '_' + seasons[ind] + '.pdf'
         fig.savefig('./plots/'+savestr)
 
     return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
