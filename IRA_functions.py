@@ -108,7 +108,7 @@ def assess_IRA(d, A_hat, B_hat, tw=100, axs=None):
         betas = {'arr': arrivals.mean(), 'mags': storage_mags.mean()}
         reses = {'arr': res_arr, 'mags': res_storage}
         r2s = {'arr': r2_arr, 'mags': r2_storage}
-        strs = {'arr': 'Interarrival period (days)', 'mags': 'Magnitude of storage recharge (m$^3$ day$^{-1}$)'}
+        strs = {'arr': 'Interarrival period (days)', 'mags': 'Magnitude of storage recharge (m^3 / day)'}
 
         for ii, key in enumerate(['arr', 'mags']):
             pdf, x_axis = pdf_ccdf(samples[key])
@@ -122,7 +122,7 @@ def assess_IRA(d, A_hat, B_hat, tw=100, axs=None):
             axs[ii+2].plot(reses[key][0], reses[key][1], 'o', color=colors[key], alpha=0.5)
             max_x = max([max(reses[key][0]), max(reses[key][1])])
             x = np.linspace(0, max_x+2, 10)
-            axs[ii+2].plot(x, x, 'k', label='r$^2$ = %g' % r2s[key])
+            axs[ii+2].plot(x, x, 'k', label='r2 = %g' % r2s[key])
             axs[ii+2].legend(loc=0)
             axs[ii+2].set_xlabel('Theoretical Quantiles')
             axs[ii+2].set_ylabel('Observed Quantiles')

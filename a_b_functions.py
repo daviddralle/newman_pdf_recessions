@@ -154,8 +154,8 @@ def kirchner_fitter(d, option=1, start=1, selectivity=200, window=3, minLen=5, a
         ax.plot(np.sort(np.log(qs)), p[2] + (p[1]+1)*np.sort(np.log(qs)) + p[0]*np.sort(np.log(qs))**2, label='kirchner quadratic', c='k')
         ax.legend(frameon=True, fancybox=True, loc=0)
         ax.set_title('b = %g, tau = %g' % (bcurr, tau))
-        ax.set_ylabel(r'log($-\frac{dq}{dt}$)')
-        ax.set_xlabel(r'log($q$)')
+        ax.set_ylabel('log(-dq/dt)')
+        ax.set_xlabel('log(q)')
 
     # elif fittingType == 'KirchnerNonlinear':
     #     ## use the linear coefficients as the init cond for the nonlinear solver
