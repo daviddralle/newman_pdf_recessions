@@ -1,6 +1,6 @@
 from math import sqrt
 import matplotlib
-# matplotlib.use('Agg')
+matplotlib.use('Agg')
 from joblib import Parallel, delayed
 import numpy as np, matplotlib.pylab as plt, seaborn as sns, mpmath as mp, scipy.special as ss, sys
 sys.path.append('os.getcwd()')
