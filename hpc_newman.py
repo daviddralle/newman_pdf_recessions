@@ -99,7 +99,7 @@ def run_newman(fh):
 
         # pdf_fitter needs a numnpy array of all daily discharge magnitudes in timeseries. If you pass it an axis, it will plot pdf of sample against best fit. 
         sample = pd.DataFrame({'q':d.tolist()}).q
-        sample = sample[0:100]
+        # sample = sample[0:100]
         MU_E[(site, seasons[ind])] = sample.mean()
         try: 
             B_pdf_hat, nu_hat, B_pdf_bse, nu_bse, mu_t, r2b = pdf_fitter(sample, ax=axes[0,1])
