@@ -49,9 +49,9 @@ def run_newman(fh):
     site = fh.split('/')[-1][:8]
     try: 
         if snowfrac.loc[site] > 0.01: 
-            return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
+            return
     except:
-        return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
+        return
 
     # weather = pickle.load( open('./daymet_newman/'+site+'_daymet.p', 'rb') )
     df = pd.read_csv(fh, delim_whitespace=True, header=-1)
@@ -99,6 +99,7 @@ def run_newman(fh):
 
         # pdf_fitter needs a numnpy array of all daily discharge magnitudes in timeseries. If you pass it an axis, it will plot pdf of sample against best fit. 
         sample = pd.DataFrame({'q':d.tolist()}).q
+        sample = sample[0:100]
         MU_E[(site, seasons[ind])] = sample.mean()
         try: 
             B_pdf_hat, nu_hat, B_pdf_bse, nu_bse, mu_t, r2b = pdf_fitter(sample, ax=axes[0,1])
@@ -121,14 +122,16 @@ def run_newman(fh):
         savestr = site + '_' + seasons[ind] + '.png'
         fig.savefig('./plots/'+savestr)
 
-    return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
+    temp_results = (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
+    savestr = site + '_results.p'
+    pickle.dump(temp_results, open('./results/' + savestr, 'wb'))
 
 
 def main():
     flow_files = a_b_functions.getFlowFileList()
-    res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
-    # res = Parallel(n_jobs=4)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
-    pickle.dump(res, open('./results.p', 'wb'))
+    Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+    # Parallel(n_jobs=1)(delayed(run_newman) (flow_files[i]) for i in [200])
+    # pickle.dump(res, open('./results.p', 'wb'))
 
 if __name__ == '__main__':
 	main()
