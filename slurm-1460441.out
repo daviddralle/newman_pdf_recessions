@@ -1,0 +1,149 @@
+Traceback (most recent call last):
+  File "hpc_newman.py", line 131, in <module>
+    main()
+  File "hpc_newman.py", line 126, in main
+    res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+  File "/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/joblib/parallel.py", line 810, in __call__
+    self.retrieve()
+  File "/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/joblib/parallel.py", line 757, in retrieve
+    raise exception
+joblib.my_exceptions.JoblibKeyError: JoblibKeyError
+___________________________________________________________________________
+Multiprocessing exception:
+...........................................................................
+/global/home/users/dralle/newman_pdf_recessions/hpc_newman.py in <module>()
+    126     res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+    127     # res = Parallel(n_jobs=4)(delayed(run_newman) (flow_files[i]) for i in [1, 2])
+    128     pickle.dump(res, open('./results.p', 'wb'))
+    129 
+    130 if __name__ == '__main__':
+--> 131 	main()
+    132 
+    133 
+    134 
+    135 
+
+...........................................................................
+/global/home/users/dralle/newman_pdf_recessions/hpc_newman.py in main()
+    121     return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
+    122 
+    123 
+    124 def main():
+    125     flow_files = a_b_functions.getFlowFileList()
+--> 126     res = Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
+        res = undefined
+    127     # res = Parallel(n_jobs=4)(delayed(run_newman) (flow_files[i]) for i in [1, 2])
+    128     pickle.dump(res, open('./results.p', 'wb'))
+    129 
+    130 if __name__ == '__main__':
+
+...........................................................................
+/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/joblib/parallel.py in __call__(self=Parallel(n_jobs=23), iterable=<generator object <genexpr>>)
+    805             if pre_dispatch == "all" or n_jobs == 1:
+    806                 # The iterable was consumed all at once by the above for loop.
+    807                 # No need to wait for async callbacks to trigger to
+    808                 # consumption.
+    809                 self._iterating = False
+--> 810             self.retrieve()
+        self.retrieve = <bound method Parallel.retrieve of Parallel(n_jobs=23)>
+    811             # Make sure that we get a last message telling us we are done
+    812             elapsed_time = time.time() - self._start_time
+    813             self._print('Done %3i out of %3i | elapsed: %s finished',
+    814                         (len(self._output), len(self._output),
+
+---------------------------------------------------------------------------
+Sub-process traceback:
+---------------------------------------------------------------------------
+KeyError                                           Fri Jun 16 02:55:37 2017
+PID: 16613Python 2.7.12: /global/home/users/dralle/miniconda2/envs/py2k_model/bin/python
+...........................................................................
+/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/joblib/parallel.py in __call__(self=<joblib.parallel.BatchedCalls object>)
+     67     def __init__(self, iterator_slice):
+     68         self.items = list(iterator_slice)
+     69         self._size = len(self.items)
+     70 
+     71     def __call__(self):
+---> 72         return [func(*args, **kwargs) for func, args, kwargs in self.items]
+        func = <function run_newman>
+        args = ('./usgs_streamflow/15/09535100_streamflow_qc.txt',)
+        kwargs = {}
+        self.items = [(<function run_newman>, ('./usgs_streamflow/15/09535100_streamflow_qc.txt',), {})]
+     73 
+     74     def __len__(self):
+     75         return self._size
+     76 
+
+...........................................................................
+/global/home/users/dralle/newman_pdf_recessions/hpc_newman.py in run_newman(fh='./usgs_streamflow/15/09535100_streamflow_qc.txt')
+     45     R2B_K = {}
+     46     A_EVENT = {}
+     47     B_EVENT = {}
+     48 
+     49     site = fh.split('/')[-1][:8]
+---> 50     if snowfrac.loc[site] > 0.01: 
+        site = '09535100'
+     51         return (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
+     52 
+     53     # weather = pickle.load( open('./daymet_newman/'+site+'_daymet.p', 'rb') )
+     54     df = pd.read_csv(fh, delim_whitespace=True, header=-1)
+
+...........................................................................
+/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/pandas/core/indexing.py in __getitem__(self=<pandas.core.indexing._LocIndexer object>, key='09535100')
+   1291             key = com._apply_if_callable(key, self.obj)
+   1292 
+   1293         if type(key) is tuple:
+   1294             return self._getitem_tuple(key)
+   1295         else:
+-> 1296             return self._getitem_axis(key, axis=0)
+        self._getitem_axis = <bound method _LocIndexer._getitem_axis of <pandas.core.indexing._LocIndexer object>>
+        key = '09535100'
+   1297 
+   1298     def _getitem_axis(self, key, axis=0):
+   1299         raise NotImplementedError()
+   1300 
+
+...........................................................................
+/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/pandas/core/indexing.py in _getitem_axis(self=<pandas.core.indexing._LocIndexer object>, key='09535100', axis=0)
+   1461                 indexer = [slice(None)] * self.ndim
+   1462                 indexer[axis] = locs
+   1463                 return self.obj.iloc[tuple(indexer)]
+   1464 
+   1465         # fall thru to straight lookup
+-> 1466         self._has_valid_type(key, axis)
+        self._has_valid_type = <bound method _LocIndexer._has_valid_type of <pandas.core.indexing._LocIndexer object>>
+        key = '09535100'
+        axis = 0
+   1467         return self._get_label(key, axis=axis)
+   1468 
+   1469 
+   1470 class _iLocIndexer(_LocationIndexer):
+
+...........................................................................
+/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/pandas/core/indexing.py in _has_valid_type(self=<pandas.core.indexing._LocIndexer object>, key='09535100', axis=0)
+   1398                 # python 3 type errors should be raised
+   1399                 if 'unorderable' in str(e):  # pragma: no cover
+   1400                     error()
+   1401                 raise
+   1402             except:
+-> 1403                 error()
+        error = <function error>
+   1404 
+   1405         return True
+   1406 
+   1407     def _get_partial_string_timestamp_match_key(self, key, labels):
+
+...........................................................................
+/global/home/users/dralle/miniconda2/envs/py2k_model/lib/python2.7/site-packages/pandas/core/indexing.py in error()
+   1385             def error():
+   1386                 if isnull(key):
+   1387                     raise TypeError("cannot use label indexing with a null "
+   1388                                     "key")
+   1389                 raise KeyError("the label [%s] is not in the [%s]" %
+-> 1390                                (key, self.obj._get_axis_name(axis)))
+   1391 
+   1392             try:
+   1393                 key = self._convert_scalar_indexer(key, axis)
+   1394                 if key not in ax:
+
+KeyError: 'the label [09535100] is not in the [index]'
+___________________________________________________________________________
