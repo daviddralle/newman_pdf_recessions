@@ -48,7 +48,7 @@ def run_newman(fh):
 
     site = fh.split('/')[-1][:8]
     try: 
-        if snowfrac.loc[site] > 0.9: 
+        if snowfrac.loc[site] > 0.01: 
             return
     except:
         return
@@ -95,7 +95,7 @@ def run_newman(fh):
         B[(site, seasons[ind])] = B_hat
         P[(site, seasons[ind])] = P_hat
         datedict[(site, seasons[ind])] = dateList
-         
+        
 
         # pdf_fitter needs a numnpy array of all daily discharge magnitudes in timeseries. If you pass it an axis, it will plot pdf of sample against best fit. 
         sample = pd.DataFrame({'q':d.tolist()}).q
@@ -107,7 +107,8 @@ def run_newman(fh):
         except: 
             B_pdf_hat, nu_hat, B_pdf_bse, nu_bse, mu_t, r2b = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
             B_whatever, nu_k, B_junk, nu_k_bse, mu_kt, r2b_k = np.nan, np.nan, np.nan, np.nan, np.nan, np.nan
-            
+        
+
         MU_KT[(site, seasons[ind])] = mu_kt
         MU_T[(site, seasons[ind])] = mu_t
         B_pdf[(site, seasons[ind])] = B_pdf_hat
@@ -125,12 +126,18 @@ def run_newman(fh):
     temp_results = (A, B, datedict, B_pdf, nu_pdf, MU_E, LAM_H, ALPHA_H, NU_K, NU_K_BSE, MU_KT, MU_T, R2B, R2B_K, A_EVENT, B_EVENT)
     savestr = site + '_results.p'
     pickle.dump(temp_results, open('./results/' + savestr, 'wb'))
+    return
 
 
 def main():
     flow_files = a_b_functions.getFlowFileList()
-    # Parallel(n_jobs=23)(delayed(run_newman) (flow_files[i]) for i in range(len(flow_files)))
-    Parallel(n_jobs=3)(delayed(run_newman) (flow_files[i]) for i in [200, 201, 202])
+    lol = lambda lst, sz: [lst[i:i+sz] for i in range(0, len(lst), sz)]
+    flow_files_lists = lol(flow_files, 46)
+    for flow_files_list in flow_files_lists:
+        Parallel(n_jobs=23)(delayed(run_newman) (flow_files_list[i]) for i in range(len(flow_files_list)))
+    # Parallel(n_jobs=3)(delayed(run_newman) (flow_files[i]) for i in [200, 201, 202])
+
+    # Parallel(n_jobs=3)(delayed(run_newman) (flow_files[i]) for i in [200, 201, 202])
     # pickle.dump(res, open('./results.p', 'wb'))
 
 if __name__ == '__main__':
