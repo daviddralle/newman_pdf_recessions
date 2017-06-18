@@ -48,7 +48,7 @@ def run_newman(fh):
 
     site = fh.split('/')[-1][:8]
     try: 
-        if snowfrac.loc[site] > 0.01: 
+        if snowfrac.loc[site] > 0.9: 
             return
     except:
         return
